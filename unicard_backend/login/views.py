@@ -1,14 +1,12 @@
-from django.shortcuts import redirect
+from django.http import HttpResponse
+from django.shortcuts import redirect, get_object_or_404
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from .models import Student, Staff
-from .serializers import (
-    StudentSerializer,
-    StaffSerializer,
-    UserLoginSerializer,
-    UserLogoutSerializer
-)
+from .serializers import *
+from rest_framework.decorators import api_view
+
 
 class StudentAPIView(generics.CreateAPIView):
     queryset = Student.objects.all()
@@ -36,3 +34,22 @@ class UserLogoutAPIView(generics.GenericAPIView):
 
 def index(request):
     return redirect('/api/login')
+
+
+@api_view(['GET'])
+def get_student_memory(request, student_code):
+    student_code = student_code.replace('_', '/')  
+    # Convert underscores back to slashes
+    student = get_object_or_404(Student, student_code=student_code)
+    data = {
+        'programme': student.programme,
+        'name': student.name(),
+        'student_code': student.student_code.replace('/', '_'),  
+        # Convert slashes to underscores
+        'signature': student.signature,
+        'exp_date': student.expdate.strftime('%Y-%m-%d')
+    }
+    return Response(data)
+
+
+
