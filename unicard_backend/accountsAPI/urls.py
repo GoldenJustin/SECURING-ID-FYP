@@ -1,12 +1,12 @@
 from django.urls import path
-from .views import get_student_memory
+from .views import id_card_data
 from .views import (
     StudentAPIView,
     StaffAPIView,
     UserLoginAPIView,
     UserLogoutAPIView,
     index,
-    get_student_memory
+    id_card_data
 )
 
 urlpatterns = [
@@ -15,4 +15,4 @@ urlpatterns = [
     path('user/login/', UserLoginAPIView.as_view(), name="login_user"),
     path('user/logout/', UserLogoutAPIView.as_view(), name="logout_user"),
     path('', index, name="index"),
-    path('student/memory/<str:student_code>/', get_student_memory, name="student_memory"),]
+    path('cardDetails/<str:student_code>/', id_card_data, name="id_card_data"),]

@@ -33,18 +33,18 @@ class UserLogoutAPIView(generics.GenericAPIView):
         return Response(serializer.validated_data, status=HTTP_200_OK)
 
 def index(request):
-    return redirect('/api/login')
+    return redirect('/user/login/')
 
 
 @api_view(['GET'])
-def get_student_memory(request, student_code):
+def id_card_data(request, student_code):
     student_code = student_code.replace('_', '/')  
     # Convert underscores back to slashes
     student = get_object_or_404(Student, student_code=student_code)
     data = {
         'programme': student.programme,
         'name': student.name(),
-        'student_code': student.student_code.replace('/', '_'),  
+        'student_code': student.student_code,
         # Convert slashes to underscores
         'signature': student.signature,
         'exp_date': student.expdate.strftime('%Y-%m-%d')
