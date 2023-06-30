@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
-from accountsAPI.models import Student
 from .models import QRModel
 import time
 import pyqrcode
@@ -9,8 +8,6 @@ from cryptography.fernet import Fernet
 import base64
 import uuid
 import os
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 
 # Generate encryption keys
@@ -46,8 +43,12 @@ def save_qr_image(text, key, student_code):
 
 
 
-def generate_qr(student):
+def generate_qr(request, student_code):
     try:
+        # Retrieve student data from the 'accountsAPI' app using the student_code
+        from accountsAPI.models import Student
+        student = Student.objects.get(student_code=student_code.replace('_', '/'))
+
         # Get the data to be displayed in the QR code
         data = {
             'programme': student.programme,
@@ -57,44 +58,28 @@ def generate_qr(student):
             'exp_date': student.expdate.strftime('%Y-%m-%d')
         }
 
-        # Check if QRModel entry already exists for the student code
-        qr_model = QRModel.objects.filter(text=student.student_code).first()
-        if qr_model:
-            qr_image_path = qr_model.qr_image.path
-            public_key = qr_model.public_key
-        else:
-            # Generate encryption keys
-            key = generate_keys()
+        # Generate encryption keys
+        key = generate_keys()
 
-            # Encrypt the data
-            encrypted_data = encrypt_text(str(data), key)
+        # Encrypt the data
+        encrypted_data = encrypt_text(str(data), key)
 
-            # Save QR image with encrypted data
-            qr_image_path = save_qr_image(str(encrypted_data), key, student.student_code)
-
-            # Create or update QRModel entry
-            if qr_model:
-                qr_model.qr_image = qr_image_path
-                qr_model.save()
-            else:
-                qr_model = QRModel.objects.create(text=student.student_code, qr_image=qr_image_path, public_key=key)
-
-            public_key = qr_model.public_key
+        # Save QR image with encrypted data
+        qr_image_path = save_qr_image(str(encrypted_data), key, student.student_code)
 
         response = {
             'status': 'success',
             'qr_image_path': qr_image_path,
-            'public_key': base64.urlsafe_b64encode(public_key).decode()
+            'public_key': base64.urlsafe_b64encode(key).decode()
         }
 
-    except Exception as e:
+    except Student.DoesNotExist:
         response = {
             'status': 'error',
-            'message': str(e)
+            'message': 'Student data not found'
         }
 
-    return response
-
+    return JsonResponse(response)
 
 
 def decrypt_text(request):
@@ -119,8 +104,3 @@ def decrypt_text(request):
         }
 
     return JsonResponse(response)
-
-@receiver(post_save, sender=Student)
-def generate_qr_on_student_creation(sender, instance, created, **kwargs):
-    if created:
-        generate_qr(instance)
