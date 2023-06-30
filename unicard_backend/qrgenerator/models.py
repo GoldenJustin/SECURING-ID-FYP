@@ -8,6 +8,7 @@ def qr_image_upload_to(instance, filename):
 class QRModel(models.Model):
     text = models.TextField()
     qr_image = models.ImageField(upload_to=qr_image_upload_to)
+    public_key = models.BinaryField()
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
