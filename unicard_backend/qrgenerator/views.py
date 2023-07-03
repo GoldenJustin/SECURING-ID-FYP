@@ -8,13 +8,12 @@ from cryptography.fernet import Fernet
 import base64
 import uuid
 import os
-
+from accountsAPI.models import Student
 
 # Generate encryption keys
 def generate_keys():
     key = Fernet.generate_key()
     return key
-
 
 # Encrypt the text
 def encrypt_text(text, key):
@@ -22,13 +21,11 @@ def encrypt_text(text, key):
     encrypted_text = cipher_suite.encrypt(text.encode())
     return encrypted_text
 
-
 # Decrypt the text
 def decrypt_text(encrypted_text, key):
     cipher_suite = Fernet(key)
     decrypted_text = cipher_suite.decrypt(encrypted_text.encode())
     return decrypted_text.decode()
-
 
 # Save QR image with encrypted text
 def save_qr_image(text, key, student_code):
@@ -41,12 +38,9 @@ def save_qr_image(text, key, student_code):
         image.png(image_path, scale=10)
     return image_path
 
-
-
-def generate_qr(request, student_code):
+def generate_qr(student_code):
     try:
         # Retrieve student data from the 'accountsAPI' app using the student_code
-        from accountsAPI.models import Student
         student = Student.objects.get(student_code=student_code.replace('_', '/'))
 
         # Get the data to be displayed in the QR code
@@ -100,7 +94,8 @@ def decrypt_text(request):
     else:
         response = {
             'status': 'error',
-            'message': 'Invalid request'
+            'message': 'Invalid encrypted text or public key'
         }
 
     return JsonResponse(response)
+

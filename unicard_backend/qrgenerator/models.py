@@ -2,16 +2,20 @@ from django.db import models
 from django.dispatch import receiver
 import os
 
+from django.db import models
+from accountsAPI.models import Student
+
 def qr_image_upload_to(instance, filename):
-    return f'Qr-Images/{instance.text.replace("/", "_")}.png'
+    return f'Qr-Images/{instance.student.student_code.replace("/", "_")}.png'
 
 class QRModel(models.Model):
-    text = models.TextField()
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
     qr_image = models.ImageField(upload_to=qr_image_upload_to)
-    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.text
+        return f"QR Code for {self.student.name()} ({self.student.student_code})"
+
 
 @receiver(models.signals.post_delete, sender=QRModel)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
