@@ -31,14 +31,14 @@ def decrypt_text(encrypted_text, key):
 def save_qr_image(text, key, student_code):
     encrypted_text = encrypt_text(text, key)
     imagename = '{}.png'.format(student_code.replace('/', '_'))
-    image_path = os.path.join('qrgenerator/Qr-Images', imagename)
+    image_path = os.path.join('media/Qr-Images', imagename)
     if not os.path.exists(image_path):  
         # Check if the image already exists
         image = pyqrcode.create(encrypted_text)
         image.png(image_path, scale=10)
     return image_path
 
-def generate_qr(student_code):
+def generate_qr(request, student_code):
     try:
         # Retrieve student data from the 'accountsAPI' app using the student_code
         student = Student.objects.get(student_code=student_code.replace('_', '/'))
@@ -98,4 +98,3 @@ def decrypt_text(request):
         }
 
     return JsonResponse(response)
-
