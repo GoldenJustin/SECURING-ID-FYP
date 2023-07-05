@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils import timezone
 from PIL import Image
-import os
 
 class Student(models.Model):
     student_code = models.CharField(max_length=100, unique=True)
@@ -27,21 +26,13 @@ class Student(models.Model):
         return f"{self.first_name} " + (f"{self.middle_name} {self.last_name}" if self.middle_name else f"{self.last_name}")
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
+        super(Student, self).save(*args, **kwargs)
         if self.avatar:
             imag = Image.open(self.avatar.path)
             if imag.width > 200 or imag.height > 200:
                 output_size = (200, 200)
                 imag.thumbnail(output_size)
-
-            last_name = self.last_name.lower()
-            student_code_suffix = self.student_code[-4:]
-            new_avatar_name = f"{last_name}_{student_code_suffix}.png"
-            new_avatar_path = os.path.join("student-avatars", new_avatar_name)
-            imag.save(new_avatar_path)
-            self.avatar.name = new_avatar_name
-            super().save(*args, **kwargs)
+                imag.save(self.avatar.path)
 
     @property
     def username(self):
