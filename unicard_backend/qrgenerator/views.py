@@ -1,100 +1,150 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from .models import QRModel
-import time
-import pyqrcode
+
 from django.conf import settings
-from cryptography.fernet import Fernet
-import base64
-import uuid
-import os
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.asymmetric import padding, rsa 
+import os, json, time, base64, pyqrcode
 from accountsAPI.models import Student
+ 
+from django.db import models
+from accountsAPI.models import Student
+from django.dispatch import receiver
 
-# Generate encryption keys
-def generate_keys():
-    key = Fernet.generate_key()
-    return key
 
-# Encrypt the text
-def encrypt_text(text, key):
-    cipher_suite = Fernet(key)
-    encrypted_text = cipher_suite.encrypt(text.encode())
-    return encrypted_text
+# Generate RSA key pair
+def generate_key_pair():
+    private_key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=2048,
+        backend=default_backend()
+    )
+    return private_key, private_key.public_key()
 
-# Decrypt the text
-def decrypt_text(encrypted_text, key):
-    cipher_suite = Fernet(key)
-    decrypted_text = cipher_suite.decrypt(encrypted_text.encode())
-    return decrypted_text.decode()
+# Encrypt the text using recipient's public key
 
-# Save QR image with encrypted text
-def save_qr_image(text, key, student_code):
-    encrypted_text = encrypt_text(text, key)
-    imagename = '{}.png'.format(student_code.replace('/', '_'))
-    image_path = os.path.join('media/Qr-Images', imagename)
-    if not os.path.exists(image_path):  
-        # Check if the image already exists
-        image = pyqrcode.create(encrypted_text)
-        image.png(image_path, scale=10)
-    return image_path
 
-def generate_qr(request, student_code):
-    try:
-        # Retrieve student data from the 'accountsAPI' app using the student_code
-        student = Student.objects.get(student_code=student_code.replace('_', '/'))
+def encrypt_text(text, public_key):
+    ciphertext = public_key.encrypt(
+        text.encode(),
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
+    return base64.urlsafe_b64encode(ciphertext).decode()
 
-        # Get the data to be displayed in the QR code
+
+@receiver(models.signals.post_save, sender=Student)
+def generate_qr(sender, instance, created, **kwargs):
+    if created:
+        # Generate QR code for the new student
         data = {
-            'programme': student.programme,
-            'name': student.name(),
-            'student_code': student.student_code.replace('/', '_'),
-            'signature': student.signature,
-            'exp_date': student.expdate.strftime('%Y-%m-%d')
+            'programme': instance.programme,
+            'name': instance.name(),
+            'student_code': instance.student_code.replace('/', '_'),
+            'signature': instance.signature,
+            'exp_date': instance.expdate.strftime('%Y-%m-%d')
         }
+        qr_data = str(data)
 
-        # Generate encryption keys
-        key = generate_keys()
+        # Generate RSA key pair
+        private_key, public_key = generate_key_pair()
 
-        # Encrypt the data
-        encrypted_data = encrypt_text(str(data), key)
+        # Encrypt the QR code data using recipient's public key
+        encrypted_data = encrypt_text(qr_data, public_key)
 
-        # Save QR image with encrypted data
-        qr_image_path = save_qr_image(str(encrypted_data), key, student.student_code)
+        qr_image_path = save_qr_image(encrypted_data, instance.student_code)
 
-        response = {
-            'status': 'success',
-            'qr_image_path': qr_image_path,
-            'public_key': base64.urlsafe_b64encode(key).decode()
-        }
+        # Create QRModel instance for the new student
+        QRModel.objects.create(student=instance, qr_image=qr_image_path)
 
-    except Student.DoesNotExist:
-        response = {
-            'status': 'error',
-            'message': 'Student data not found'
-        }
 
-    return JsonResponse(response)
+def generate_key_pair():
+    private_key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=2048,
+        backend=default_backend()
+    )
+    return private_key, private_key.public_key()
+
+
+def encrypt_text(text, public_key):
+    ciphertext = public_key.encrypt(
+        text.encode(),
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
+    return base64.urlsafe_b64encode(ciphertext).decode()
 
 
 def decrypt_text(request):
+    # Decrypt the encrypted text using the private key (server-side operation)
+    # Ensure proper authentication and authorization before performing decryption
+
     encrypted_text = request.GET.get('encrypted_text')
-    public_key = request.GET.get('public_key')
+    private_key = request.GET.get('private_key')
 
-    if encrypted_text and public_key:
-        # Decode the public key
-        key = base64.urlsafe_b64decode(public_key.encode())
+    if encrypted_text and private_key:
+        try:
+            # Decode the private key
+            private_key_bytes = private_key.encode()
+            private_key_obj = serialization.load_pem_private_key(
+                private_key_bytes, password=None, backend=default_backend())
 
-        # Decrypt the encrypted text
-        decrypted_text = decrypt_text(encrypted_text, key)
+            # Decrypt the encrypted text using the private key
+            ciphertext = base64.urlsafe_b64decode(encrypted_text.encode())
+            plaintext = private_key_obj.decrypt(
+                ciphertext,
+                padding.OAEP(
+                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                    algorithm=hashes.SHA256(),
+                    label=None
+                )
+            )
 
-        response = {
-            'status': 'success',
-            'decrypted_text': decrypted_text
-        }
+            decrypted_data = plaintext.decode()
+
+            response = {
+                'status': 'success',
+                'decrypted_text': decrypted_data
+            }
+
+        except (ValueError, TypeError, AttributeError):
+            response = {
+                'status': 'error',
+                'message': 'Invalid encrypted text or private key'
+            }
     else:
         response = {
             'status': 'error',
-            'message': 'Invalid encrypted text or public key'
+            'message': 'Invalid encrypted text or private key'
         }
 
     return JsonResponse(response)
+
+
+def save_qr_image(encrypted_data, student_code):
+    imagename = '{}.png'.format(student_code.replace('/', '_'))
+    image_path = os.path.join('media', 'Qr-Images', imagename)
+    if not os.path.exists(image_path):
+        qr = pyqrcode.create(encrypted_data)
+
+        # Save the encrypted QR code image
+        qr.png(image_path, scale=10)
+
+    return image_path
+
+
+@receiver(models.signals.pre_delete, sender=QRModel)
+def auto_delete_qr_image(sender, instance, **kwargs):
+    # Delete the QR code image when the QRModel instance is deleted
+    if instance.qr_image:
+        if os.path.isfile(instance.qr_image.path):
+            os.remove(instance.qr_image.path)
