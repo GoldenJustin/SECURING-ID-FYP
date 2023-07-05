@@ -1,14 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from .models import QRModel
-
 from django.conf import settings
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import padding, rsa 
 import os, json, time, base64, pyqrcode
 from accountsAPI.models import Student
- 
 from django.db import models
 from accountsAPI.models import Student
 from django.dispatch import receiver
