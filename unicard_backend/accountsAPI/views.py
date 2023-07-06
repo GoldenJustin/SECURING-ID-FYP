@@ -53,3 +53,4 @@ def id_card_data(request, student_code):
 
 
 
+
