@@ -93,16 +93,27 @@ def generate_qr(sender, instance, created, **kwargs):
         # Encrypt the QR code data using recipient's public key
         encrypted_data = encrypt_text(qr_data, public_key)
 
+        # Print the encrypted data to the console
+        print("\n\n\nEncrypted Data:", encrypted_data)
+
+        # Decrypt the encrypted data
+        decrypted_data = decrypt_text(encrypted_data)
+
+        # Print the decrypted data to the console
+        print("\n\n\nDecrypted Data:", decrypted_data)
+
         qr_image_path = save_qr_image(encrypted_data, instance.student_code)
 
         # Create QRModel instance for the new student
         QRModel.objects.create(student=instance, qr_image=qr_image_path)
 
-def decrypt_text(request):
+
+
+
+def decrypt_text(encrypted_text):
     # Decrypt the encrypted text using the private key (server-side operation)
     # Ensure proper authentication and authorization before performing decryption
 
-    encrypted_text = request.GET.get('encrypted_text')
     private_key = load_private_key()
 
     # Decrypt the data
@@ -117,10 +128,8 @@ def decrypt_text(request):
     )
     decrypted_data = plaintext.decode()
 
-    context = {
-        'decrypted_data': decrypted_data
-    }
-    return JsonResponse(context)
+    return decrypted_data
+
 
 @receiver(models.signals.pre_delete, sender=QRModel)
 def auto_delete_qr_image(sender, instance, **kwargs):
