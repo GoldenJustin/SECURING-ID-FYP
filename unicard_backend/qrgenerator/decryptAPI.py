@@ -11,6 +11,11 @@ def decrypt_api(request):
         if encrypted_data:
             decrypted_data = decrypt_text(encrypted_data)
 
+            # Print the encrypted data, decrypted data, and data being sent to the frontend
+            print('\n\nEncrypted Data:', encrypted_data)
+            print('\n\nDecrypted Data:', decrypted_data, '\n\n')
+            
+
             # Convert the decrypted student code to the format used in the database
             student_code = decrypted_data.replace('_', '/')
 
@@ -26,8 +31,10 @@ def decrypt_api(request):
                 }
 
                 response = {
-                    'data': data
+                    'STUDENT DATA': data
                 }
+                
+                print('STUDENT DATA TO FRONTEND', data, '\n\n')
                 return JsonResponse(response)
             except Student.DoesNotExist:
                 response = {

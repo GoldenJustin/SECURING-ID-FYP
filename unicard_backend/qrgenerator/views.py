@@ -68,7 +68,7 @@ def save_qr_image(encrypted_data, student_code):
         qr = pyqrcode.create(encrypted_data)
 
         # Save the encrypted QR code image
-        qr.png(image_path, scale=10)
+        qr.png(image_path, scale=2)
 
     return image_path
 
