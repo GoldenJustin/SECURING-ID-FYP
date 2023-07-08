@@ -1,11 +1,12 @@
 from django.http import HttpResponse
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, render,get_object_or_404
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from .models import Student, Staff
 from .serializers import *
 from rest_framework.decorators import api_view
+
 
 
 class StudentAPIView(generics.CreateAPIView):
@@ -46,25 +47,76 @@ from .models import Student
 def id_card_data(request, student_code):
     student_code = student_code.replace('_', '/')
     student = get_object_or_404(Student, student_code=student_code)
-    data = {
-        'programme': student.programme,
-        'name': student.name(),
-        'student_code': student.student_code,
-        'signature': student.signature,
-        'exp_date': student.expdate.strftime('%Y-%m-%d'),
-        'avatar_url': request.build_absolute_uri(student.avatar.url),
-        # 'qrcode_url': request.build_absolute_uri(student.qrcode.url)
-    }
+    
+    # Check if the student has paid
+    if student.status == '1':  
+        payment_message = 'Paid'
+        
+        data = {
+            'programme': student.programme,
+            'name': student.name(),
+            'student_code': student.student_code,
+            'signature': student.signature,
+            'exp_date': student.expdate.strftime('%Y-%m-%d'),
+            'avatar_url': request.build_absolute_uri(student.avatar.url),
+            'payment_status': payment_message,
+        }
 
-    # Get the base URL of the media folder where QR code images are saved
-    media_url = f"{request.scheme}://{get_current_site(request).domain}/media/"
+        # Get the base URL of the media folder where QR code images are saved
+        media_url = f"{request.scheme}://{get_current_site(request).domain}/media/"
 
-    # Append the QR code image URL based on the student's student_code
-    qrcode_filename = student.student_code.replace('/', '_') + '.png'
-    qrcode_url = f"{media_url}Qr-Images/{qrcode_filename}"
-    data['qrcode_url'] = qrcode_url
+        # Append the QR code image URL based on the student's student_code
+        qrcode_filename = student.student_code.replace('/', '_') + '.png'
+        qrcode_url = f"{media_url}Qr-Images/{qrcode_filename}"
+        data['qrcode_url'] = qrcode_url
+        
+        return Response(data)
+    
+    return Response()  # Return an empty response if the student's status is 0
 
-    return Response(data)
+
+
+@api_view(['POST'])
+def make_payment(request, student_code):
+    student_code = student_code.replace('_', '/')
+    student = get_object_or_404(Student, student_code=student_code)
+
+    payment_amount = float(request.data.get('payment_amount'))
+
+    if payment_amount is not None:
+        student.payment_amount = payment_amount
+
+        if payment_amount > 20000:
+            student.status = '1'
+        else:
+            student.status = '0'
+
+        student.save()
+
+    return Response({'status': student.status})
+
+
+# from .models import *
+# from django.http import JsonResponse
+# from .serializers import *
+
+
+# def Home(request):
+    # reporter = Reporter.objects.all()
+    # scammer = Scammer.objects.all()
+    # total_reports = reporter.count()
+    # ripoti = Info.objects.all()
+    # context = {
+    #     'reporter': reporter,
+    #     'scammer': scammer,
+    #     'ripoti': ripoti,
+    #     'total_reports': total_reports
+    # }
+    # return render(request, 'templates/index.html')
+
+def Home(request, template="index.html"):
+    return render(request, template, {})
+
 
 
 

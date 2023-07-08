@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+
+    <!-- Admin Login Form -->
+    <h2>Login</h2>
+    <form action="/admin/login" method="POST">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+        <input type="submit" value="Login">
+    </form>
+
+    <!-- Add Student Form -->
+    <h2>Add Student</h2>
+    <form action="/admin/add_student" method="POST">
+        <label for="student_name">Name:</label>
+        <input type="text" id="student_name" name="student_name" required><br>
+        <label for="student_code">Student Code:</label>
+        <input type="text" id="student_code" name="student_code" required><br>
+        <label for="payment_status">Payment Status:</label>
+        <select id="payment_status" name="payment_status" required>
+            <option value="paid">Paid</option>
+            <option value="pending">Pending</option>
+        </select><br>
+        <input type="submit" value="Add Student">
+    </form>
+
+    <!-- Add Staff Form -->
+    <h2>Add Staff</h2>
+    <form action="/admin/add_staff" method="POST">
+        <label for="staff_name">Name:</label>
+        <input type="text" id="staff_name" name="staff_name" required><br>
+        <label for="staff_code">Staff Code:</label>
+        <input type="text" id="staff_code" name="staff_code" required><br>
+        <input type="submit" value="Add Staff">
+    </form>
+
+    <!-- ID Card Requests -->
+    <h2>ID Card Requests</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Code</th>
+            <th>Payment Status</th>
+            <th>Actions</th>
+        </tr>
+        <tr>
+            <td>John Doe</td>
+            <td>STU123</td>
+            <td>Pending</td>
+            <td>
+                <button>Process Payment</button>
+                <button>Issue ID Card</button>
+            </td>
+        </tr>
+        <tr>
+            <td>Jane Smith</td>
+            <td>STU456</td>
+            <td>Paid</td>
+            <td>
+                <button>Issue ID Card</button>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

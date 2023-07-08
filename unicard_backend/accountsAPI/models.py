@@ -15,6 +15,8 @@ class Student(models.Model):
     expdate = models.DateField()
     programme = models.TextField(null=True, blank=True)
     signature = models.TextField(null=True, blank=True)
+    payment_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    status = models.CharField(max_length=1, choices=(("0", "Not Paid"), ("1", "Paid")), default="0")  # New field
     avatar = models.ImageField(upload_to="student-avatars/", null=True, blank=True)
     date_added = models.DateTimeField(default=timezone.now)
     date_created = models.DateTimeField(auto_now=True)

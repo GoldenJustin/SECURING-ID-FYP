@@ -59,15 +59,18 @@ class UserLoginSerializer(serializers.Serializer):
             raise ValidationError("User already logged in.")
         if student:
             data['token'] = str(uuid4())
+            data['role'] = 'student'  
             student.ifLogged = True
             student.token = data['token']
             student.save()
         else:
             data['token'] = str(uuid4())
+            data['role'] = 'staff'  
             staff.ifLogged = True
             staff.token = data['token']
             staff.save()
         return data
+
 
 class UserLogoutSerializer(serializers.Serializer):
     token = serializers.CharField()
