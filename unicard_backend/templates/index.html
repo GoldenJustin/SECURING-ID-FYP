@@ -2,71 +2,290 @@
 <html>
 <head>
     <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Default Light Theme */
+        body {
+            background-color: rgba(52, 51, 56, 0.55);
+            color: white;
+        }
+
+        .navbar {
+            background-color: rgba(1, 217, 94, 0.25);
+        }
+
+        .sidebar {
+            background-color: rgba(20, 20, 22, 1);
+            color: white;
+        }
+
+        .form-control,
+        .btn {
+            background-color: rgba(1, 217, 94, 0.25);
+            color: white;
+            border-color: rgba(1, 217, 94, 0.25);
+        }
+
+        .form-control:focus,
+        .btn:focus {
+            background-color: rgba(1, 217, 94, 0.25);
+            border-color: rgba(1, 217, 94, 0.25);
+            box-shadow: none;
+        }
+
+        .table {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Dark Theme */
+        .dark-theme {
+            background-color: #0a0a0a;
+            color: #ffffff;
+        }
+
+        .dark-theme .navbar {
+            background-color: #011d0e;
+        }
+
+        .dark-theme .sidebar {
+            background-color: #141416;
+            color: #ffffff;
+        }
+
+        .dark-theme .form-control,
+        .dark-theme .btn {
+            background-color: #011d0e;
+            color: #ffffff;
+            border-color: #011d0e;
+        }
+
+        .dark-theme .form-control:focus,
+        .dark-theme .btn:focus {
+            background-color: #011d0e;
+            border-color: #011d0e;
+            box-shadow: none;
+        }
+
+        .dark-theme .table {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Improved Visibility */
+        .form-group label,
+        .table thead th {
+            color: white;
+        }
+
+        .form-control,
+        .btn,
+        .table td,
+        .table th {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .dark-theme .form-group label,
+        .dark-theme .table thead th {
+            color: #ffffff;
+        }
+
+        .dark-theme .form-control,
+        .dark-theme .btn,
+        .dark-theme .table td,
+        .dark-theme .table th {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+    </style>
 </head>
 <body>
-    <h1>Admin Dashboard</h1>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="#">Admin Dashboard</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Settings</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-    <!-- Admin Login Form -->
-    <h2>Login</h2>
-    <form action="/admin/login" method="POST">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br>
-        <input type="submit" value="Login">
-    </form>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="sidebar p-3 mb-3">
+                    <h2>Add Student</h2>
+                    <form action="/admin/add_student" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="student_code">Student Code:</label>
 
-    <!-- Add Student Form -->
-    <h2>Add Student</h2>
-    <form action="/admin/add_student" method="POST">
-        <label for="student_name">Name:</label>
-        <input type="text" id="student_name" name="student_name" required><br>
-        <label for="student_code">Student Code:</label>
-        <input type="text" id="student_code" name="student_code" required><br>
-        <label for="payment_status">Payment Status:</label>
-        <select id="payment_status" name="payment_status" required>
-            <option value="paid">Paid</option>
-            <option value="pending">Pending</option>
-        </select><br>
-        <input type="submit" value="Add Student">
-    </form>
+                            <input type="text" class="form-control" id="student_code" name="student_code" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password:</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ifLogged">Logged In:</label>
+                            <input type="checkbox" class="form-control" id="ifLogged" name="ifLogged">
+                        </div>
+                        <div class="form-group">
+                            <label for="token">Token:</label>
+                            <input type="text" class="form-control" id="token" name="token">
+                        </div>
+                        <div class="form-group">
+                            <label for="first_name">First Name:</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="middle_name">Middle Name:</label>
+                            <input type="text" class="form-control" id="middle_name" name="middle_name">
+                        </div>
+                        <div class="form-group">
+                            <label for="last_name">Last Name:</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender:</label>
+                            <select class="form-control" id="gender" name="gender" required>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="expdate">Expiration Date:</label>
+                            <input type="date" class="form-control" id="expdate" name="expdate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="programme">Programme:</label>
+                            <textarea class="form-control" id="programme" name="programme"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="signature">Signature:</label>
+                            <textarea class="form-control" id="signature" name="signature"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="payment_amount">Payment Amount:</label>
+                            <input type="number" step="0.01" class="form-control" id="payment_amount" name="payment_amount">
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Payment Status:</label>
+                            <select class="form-control" id="status" name="status" required>
+                                <option value="0">Not Paid</option>
+                                <option value="1">Paid</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="avatar">Avatar:</label>
+                            <input type="file" class="form-control" id="avatar" name="avatar">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Student</button>
+                    </form>
+                </div>
+                
 
-    <!-- Add Staff Form -->
-    <h2>Add Staff</h2>
-    <form action="/admin/add_staff" method="POST">
-        <label for="staff_name">Name:</label>
-        <input type="text" id="staff_name" name="staff_name" required><br>
-        <label for="staff_code">Staff Code:</label>
-        <input type="text" id="staff_code" name="staff_code" required><br>
-        <input type="submit" value="Add Staff">
-    </form>
+                <div class="sidebar p-3 mb-3">
+                    <h2>Add Staff</h2>
+                    <form action="/admin/add_staff" method="POST">
+                        <div class="form-group">
+                            <label for="staff_name">Name:</label>
+                            <input type="text" class="form-control" id="staff_name" name="staff_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="staff_code">Staff Code:</label>
+                            <input type="text" class="form-control" id="staff_code" name="staff_code" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Staff</button>
+                    </form>
+                </div>
+            </div>
 
-    <!-- ID Card Requests -->
-    <h2>ID Card Requests</h2>
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Code</th>
-            <th>Payment Status</th>
-            <th>Actions</th>
-        </tr>
-        <tr>
-            <td>John Doe</td>
-            <td>STU123</td>
-            <td>Pending</td>
-            <td>
-                <button>Process Payment</button>
-                <button>Issue ID Card</button>
-            </td>
-        </tr>
-        <tr>
-            <td>Jane Smith</td>
-            <td>STU456</td>
-            <td>Paid</td>
-            <td>
-                <button>Issue ID Card</button>
-            </td>
-        </tr>
-    </table>
+            <div class="col-lg-9">
+                <div class="p-3">
+                    <h2>ID Card Requests</h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Code</th>
+                                <th>Payment Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>John Doe</td>
+                                <td>STU123</td>
+                                <td>Pending</td>
+                                <td>
+                                    <button class="btnbtn-primary">Process Payment</button>
+                                    <button class="btn btn-primary">Issue ID Card</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Jane Smith</td>
+                                <td>STU456</td>
+                                <td>Paid</td>
+                                <td>
+                                    <button class="btn btn-primary">Issue ID Card</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="p-3">
+                    <h2>Settings</h2>
+                    <button class="btn btn-primary" onclick="toggleTheme()">Toggle Theme</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for student in students %}
+                            <div class="id-card">
+                                <div class="front-side">
+                                    <h1>Front Side</h1>
+                                    <p>Student Code: {{ student.student_code }}</p>
+                                    <p>Name: {{ student.name }}</p>
+                                    <!-- Add other student details on the front side -->
+                                </div>
+                                <div class="back-side">
+                                    <h1>Back Side</h1>
+                                    <p>Programme: {{ student.programme }}</p>
+                                    <p>Expiration Date: {{ student.expdate }}</p>
+                                    <!-- Add other student details on the back side -->
+                                </div>
+                            </div>
+                        {% endfor %}
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Light/Dark Theme Toggle
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+        }
+    </script>
 </body>
 </html>

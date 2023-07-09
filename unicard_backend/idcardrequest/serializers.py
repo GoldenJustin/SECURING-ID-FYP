@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from idcardrequest.models import IDCardRequest
+from accountsAPI.models import Student
 
 class IDCardRequestSerializer(serializers.ModelSerializer):
     class Meta:
-        model = IDCardRequest
+        model = Student
         fields = '__all__'

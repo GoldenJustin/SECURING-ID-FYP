@@ -92,3 +92,7 @@ class UserLogoutSerializer(serializers.Serializer):
             staff.save()
         data['status'] = "User is logged out."
         return data
+
+
+class NumberSerializer(serializers.Serializer):
+    number = serializers.IntegerField()
