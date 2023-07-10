@@ -6,6 +6,9 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from .models import Student, Staff
 from .serializers import *
 from rest_framework.decorators import api_view
+from django.contrib.sites.shortcuts import get_current_site
+from rest_framework.decorators import api_view
+from django.shortcuts import get_object_or_404
 
 
 
@@ -36,12 +39,6 @@ class UserLogoutAPIView(generics.GenericAPIView):
 def index(request):
     return redirect('/user/login/')
 
-
-from django.contrib.sites.shortcuts import get_current_site
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from django.shortcuts import get_object_or_404
-from .models import Student
 
 @api_view(['GET'])
 def universal_api(request, student_code):
@@ -98,8 +95,7 @@ def id_card_data(request, student_code):
         
         return Response(data)
     
-    return Response()  # Return an empty response if the student's status is 0
-
+    return Response()
 
 
 @api_view(['POST'])

@@ -72,6 +72,19 @@ def save_qr_image(encrypted_data, student_code):
 
     return image_path
 
+def delete_qr_image(student_code):
+    imagename = '{}.png'.format(student_code.replace('/', '_'))
+    image_path = os.path.join('media', 'Qr-Images', imagename)
+    if os.path.exists(image_path):
+        os.remove(image_path)
+
+# @receiver(models.signals.pre_delete, sender=QRModel)
+# def auto_delete_qr_image(sender, instance, **kwargs):
+#     # Delete the QR code image when the QRModel instance is deleted
+#     if instance.qr_image:
+#         if os.path.isfile(instance.qr_image.path):
+#             os.remove(instance.qr_image.path)
+
 @receiver(models.signals.post_save, sender=Student)
 def generate_qr(sender, instance, created, **kwargs):
     if created:
@@ -124,11 +137,3 @@ def decrypt_text(encrypted_text):
     decrypted_data = plaintext.decode()
 
     return decrypted_data
-
-
-@receiver(models.signals.pre_delete, sender=QRModel)
-def auto_delete_qr_image(sender, instance, **kwargs):
-    # Delete the QR code image when the QRModel instance is deleted
-    if instance.qr_image:
-        if os.path.isfile(instance.qr_image.path):
-            os.remove(instance.qr_image.path)
