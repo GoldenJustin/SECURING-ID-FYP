@@ -12,9 +12,7 @@ const kMediumTextStyle = TextStyle(
     letterSpacing: -2
 );
 
-const kDefaultTextStyle = TextStyle(
 
-);
 
 /// Colors
 const kGreenColor = Color.fromARGB(255,1, 217, 94);

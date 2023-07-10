@@ -32,7 +32,6 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -129,13 +128,13 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                               },
                               child: obsecureText
                                   ? const Icon(
-                                Icons.visibility_off,
-                                color: kGreenColor,
-                              )
+                                      Icons.visibility_off,
+                                      color: kGreenColor,
+                                    )
                                   : const Icon(
-                                Icons.visibility,
-                                color: kGreenColor,
-                              ),
+                                      Icons.visibility,
+                                      color: kGreenColor,
+                                    ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(40.0),
@@ -171,8 +170,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                           },
                           child: const Text(
                             'Login',
-                            style:
-                            TextStyle(color: Colors.white, fontSize: 25),
+                            style: TextStyle(color: Colors.white, fontSize: 25),
                           ),
                         ),
                       ),
@@ -201,7 +199,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
     };
 
     var res =
-    await apiServices?.authenticationPostRequest(data, '/user/login/');
+        await apiServices?.authenticationPostRequest(data, '/user/login/');
 
     if (res != null) {
       var body = json.decode(res.body);
@@ -209,13 +207,11 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
       String token = body['token'];
       String role = body['role'];
 
-       prefs.setString('token', token);
-       prefs.setString('role', role);
-      // var localStoredStoken = await prefs.getString('token');
-      // print('^^^^^&^%%%&%&%&%&%&%&%^^%&%*^*^&?><>>>>>>>>>>>>>>>>>>>>> ${localStoredStoken}');
-      // _navigateToHomeScreen(role);
+      prefs.setString('token', token);
+      prefs.setString('role', role);
 
-      print('--------------------- PRINTING BODY -----------------------------------');
+      print(
+          '--------------------- PRINTING BODY -----------------------------------');
       print(body);
       print('--------------------- -----------------------------------');
 
@@ -223,19 +219,21 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => StudentHomeScreen(username: body['username'],),
+            builder: (context) => StudentHomeScreen(
+              username: body['username'],
+            ),
           ),
         );
-      } else if (role == 'staff')
-      {
+      } else if (role == 'staff') {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => StaffHomeScreen(username: body['username'] ,),
+            builder: (context) => StaffHomeScreen(
+              username: body['username'],
+            ),
           ),
         );
       }
     }
   }
 }
-
