@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import Home, id_card_data, make_payment
+from .views import Home, id_card_data, make_payment, universal_api
 from .views import (
     StudentAPIView,
     StaffAPIView,
@@ -17,5 +17,8 @@ urlpatterns = [
     path('login/', index, name="index"),
     path('cardDetails/<str:student_code>/', id_card_data, name="card_data"),
     path('payment/<str:student_code>/', make_payment, name='make_payment'),
+    path('universal/<str:student_code>/', universal_api, name='universal'),
+
     path('', Home, name='Home'),
+    
 ]

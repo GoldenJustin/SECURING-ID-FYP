@@ -44,6 +44,32 @@ from django.shortcuts import get_object_or_404
 from .models import Student
 
 @api_view(['GET'])
+def universal_api(request, student_code):
+    student_code = student_code.replace('_', '/')
+    student = get_object_or_404(Student, student_code=student_code)
+    
+    data = {
+        'student_code': student.student_code,
+        'email': student.email,
+        'ifLogged': student.ifLogged,
+        'first_name': student.first_name,
+        'middle_name': student.middle_name,
+        'last_name': student.last_name,
+        'gender': student.gender,
+        'exp_date': student.expdate.strftime('%Y-%m-%d'),
+        'programme': student.programme,
+        'signature': student.signature,
+        'status': student.status,
+        'avatar_url': request.build_absolute_uri(student.avatar.url),
+        'date_added': student.date_added.strftime('%Y-%m-%d %H:%M:%S'),
+        'date_created': student.date_created.strftime('%Y-%m-%d %H:%M:%S'),
+        'username': student.username,
+    }
+
+    return Response(data)
+
+
+@api_view(['GET'])
 def id_card_data(request, student_code):
     student_code = student_code.replace('_', '/')
     student = get_object_or_404(Student, student_code=student_code)
