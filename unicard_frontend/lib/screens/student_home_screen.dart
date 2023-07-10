@@ -14,14 +14,14 @@ class StudentHomeScreen extends StatefulWidget {
 
   var username, password, token, loggedInStudentCode;
 
-  StudentHomeScreen({this.username, this.password, this.token});
+  StudentHomeScreen({Key? key, this.username, this.password, this.token});
 
   @override
   State<StudentHomeScreen> createState() => _StudentHomeScreenState();
 }
 
 class _StudentHomeScreenState extends State<StudentHomeScreen> {
-  bool isFrontSide = true;
+
 
   Future<void> _back() async {
     await _logout();
@@ -246,8 +246,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
   void fetchStudentInfo(BuildContext context) async {
     String studentCode = '${widget.username!.replaceAll('/', '_')}';
     print(
-        '----------------------PRINTING STUDENT CODE-------------------------------\n \n \n');
-    print('${studentCode}');
+        '\n\n\n\n--------------PRINTING STUDENT CODE-------${studentCode}------------------------\n \n \n');
+
     print(
         '\n \n \n--------------------------------------------------------------------');
 

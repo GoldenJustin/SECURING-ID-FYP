@@ -1,8 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../constants/constants.dart';
+import 'student_home_screen.dart';
 
 class MakePaymentPage extends StatefulWidget {
   final String loggedInStudentCode; // Student code of the logged-in user
@@ -27,7 +28,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
     final paymentAmount = double.parse(_paymentAmountController.text);
 
     final modifiedStudentCodeInput =
-    widget.loggedInStudentCode.replaceAll('/', '_');
+        widget.loggedInStudentCode.replaceAll('/', '_');
     final url = Uri.parse(
         'http://192.168.1.161:8000/payment/$modifiedStudentCodeInput/');
     final response = await http
@@ -42,10 +43,13 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
     if (paymentAmount < 20000) {
       dialogueTitle = 'Request Received';
       dialogueContent =
-      'Request received, but you will get your ID once you complete the payment';
+          'Request received, but you will get your ID once you complete the payment';
     } else {
       dialogueTitle = 'Request Approved';
-      dialogueContent = 'Congratulations! Your request has been approved';
+      dialogueContent =
+          'Congratulations! Your request has been approved\n '
+              'Please visit the offices to get your New id\n '
+              'You can navigate to VIEW ID from home page';
     }
 
     showDialog(
@@ -67,8 +71,16 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
               child: Text('Go Home'),
               onPressed: () {
                 // Perform action when "Go Home" button is pressed
-                Navigator.of(context).pop();
-                // Add your code to navigate to the home page
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => StudentHomeScreen(
+                      username: widget.loggedInStudentCode,
+                      password: '', // Add the password if needed
+                      token: '', // Add the token if needed
+                    ),
+                  ),
+                );
               },
             ),
           ],

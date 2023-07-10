@@ -17,24 +17,24 @@ class LossReportUploadPage extends StatefulWidget {
 
 class _LossReportUploadPageState extends State<LossReportUploadPage> {
   String? _filePath;
-  Future<String?>? _fetchStudentName;
+  Future<String?>? _fetchStudentSignature;
 
   @override
   void initState() {
     super.initState();
-    _fetchStudentName = fetchStudentName();
+    _fetchStudentSignature = fetchStudentSignature();
     _openFilePicker();
   }
 
-  Future<String?> fetchStudentName() async {
+  Future<String?> fetchStudentSignature() async {
     final modifiedStudentCode = widget.studentCode.replaceAll('/', '_');
-    final url = Uri.parse('http://192.168.1.161:8000/cardDetails/$modifiedStudentCode/');
+    final url = Uri.parse('http://192.168.1.161:8000/universal/$modifiedStudentCode/');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
-      final studentName = responseData['name'] ?? 'Unknown'; // Provide a default value
-      return studentName;
+      final studentSignature = responseData['signature'] ?? 'Unknown'; // Provide a default value
+      return studentSignature;
     } else {
       throw Exception('Failed to fetch student details');
     }
@@ -118,34 +118,42 @@ class _LossReportUploadPageState extends State<LossReportUploadPage> {
         title: Text('Upload Loss Report'),
       ),
       body: FutureBuilder<String?>(
-        future: _fetchStudentName,
+        future: _fetchStudentSignature,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Failed to fetch student details'));
           } else {
-            final studentName = snapshot.data ?? 'Unknown'; // Provide a default value
+            final studentSignature = snapshot.data ?? 'Unknown'; // Provide a default value
             return Column(
               children: [
-                if (_filePath != null)
-                  Container(
-                    color: Colors.green[200],
-                    padding: EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '$studentName \nLoss Report',
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                        ElevatedButton(
-                          onPressed: _uploadFile,
-                          child: Text('Upload File'),
-                        ),
-                      ],
-                    ),
+                Container(
+                  color: Colors.green[200],
+                  padding: EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Signature: $studentSignature',
+                            style: TextStyle(fontSize: 19.0,
+                            fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            'Loss Report',
+                            style: TextStyle(fontSize: 16.0),
+                          ),
+                        ],
+                      ),
+                      ElevatedButton(
+                        onPressed: _uploadFile,
+                        child: Text('Upload File'),
+                      ),
+                    ],
                   ),
+                ),
               ],
             );
           }

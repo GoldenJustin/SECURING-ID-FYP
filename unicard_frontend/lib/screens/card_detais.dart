@@ -80,7 +80,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
           ),
         ],
       );
-    } else if (programme.isNotEmpty &&
+    } else if(programme.isNotEmpty &&
         name.isNotEmpty &&
         studentCode.isNotEmpty &&
         signature.isNotEmpty &&
@@ -221,7 +221,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
       );
     } else {
       return Center(
-        child: Text(''),
+        child: Text('Failed'),
       );
     }
   }
